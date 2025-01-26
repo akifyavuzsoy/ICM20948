@@ -1,4 +1,9 @@
-../Core/Src/controller.c:15:6:check_System_Status_Action	16	static
-../Core/Src/controller.c:66:6:check_icm20948	24	static
-../Core/Src/controller.c:97:6:check_ak09916	24	static
-../Core/Src/controller.c:127:6:reset_icm20948	24	static
+../Core/Src/controller.c:16:6:check_System_Status_Action	16	static
+../Core/Src/controller.c:67:6:system_Init	16	static
+../Core/Src/controller.c:97:6:system_Controller	16	static
+../Core/Src/controller.c:126:6:set_Datasets	16	static
+../Core/Src/controller.c:151:6:write_float_to_array	48	static
+../Core/Src/controller.c:173:6:GetCRC	32	static
+../Core/Src/controller.c:212:6:check_icm20948	24	static
+../Core/Src/controller.c:243:6:check_ak09916	24	static
+../Core/Src/controller.c:273:6:reset_icm20948	24	static

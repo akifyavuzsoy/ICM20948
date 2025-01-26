@@ -15,7 +15,7 @@
 
 #define MAJ_VERSİON		01
 #define MIN_VERSİON		01
-#define REV_VERSİON		02
+#define REV_VERSİON		03
 
 typedef enum {
     SYS_SUCCESS,
@@ -68,8 +68,10 @@ void check_icm20948(sysController_t *this);
 void check_ak09916(sysController_t *this);
 void reset_icm20948(sysController_t *this);
 
-
-
 void check_System_Status_Action(sysController_t *this);
+
+void set_Datasets(sysController_t *this);
+void write_float_to_array(sysController_t *this, axises data_f, uint8_t addr);
+void GetCRC(uint8_t data[], uint8_t size);
 
 #endif /* INC_CONTROLLER_H_ */

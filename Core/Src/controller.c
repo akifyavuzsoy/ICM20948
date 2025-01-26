@@ -57,7 +57,13 @@ void check_System_Status_Action(sysController_t *this)
 // TODO: IMU Init Fonksiyonu oluştur...
 // TODO: IMU adımlarını oluştur...
 
-
+/**
+* @brief Initializes the system controller with the IMU initialization step.
+* @note This function sets the initial step to IMU_INIT and performs the ICM-20948 initialization.
+*       Based on the initialization status, it updates the system status and moves to the next step.
+* @param this: Pointer to the system controller structure.
+* @retval None
+*/
 void system_Init(sysController_t *this)
 {
 	this->init_Step = IMU_INIT;
@@ -65,12 +71,12 @@ void system_Init(sysController_t *this)
 	switch(this->init_Step)
 	{
 		case IMU_INIT:
-			status = icm20948_init(ICM20948_I2C_CH);
-			if(status == HAL_OK){
+			this->status = icm20948_init(ICM20948_I2C_CH);
+			if(this->status == HAL_OK){
 				this->sys_Status = SYS_SUCCESS;
 				this->sys_Step = IMU_READ;
 			}
-			else if (status == HAL_ERROR) {
+			else if (this->status == HAL_ERROR) {
 				this->sys_Status = SYS_ERROR;
 			}
 			else{
@@ -82,14 +88,20 @@ void system_Init(sysController_t *this)
 	}
 }
 
+/**
+* @brief Handles the system controller operations based on the current system step.
+* @note This function performs IMU data reading and dataset preparation steps.
+* @param this: Pointer to the system controller structure.
+* @retval None
+*/
 void system_Controller(sysController_t *this)
 {
 
 	switch(this->sys_Step)
 	{
 		case IMU_READ:
-			icm20948_gyro_read_dps(ICM20948_I2C_CH, this->gyro_datas);
-			icm20948_accel_read_g(ICM20948_I2C_CH, this->accel_datas);
+			icm20948_gyro_read_dps(ICM20948_I2C_CH, &this->gyro_datas);
+			icm20948_accel_read_g(ICM20948_I2C_CH, &this->accel_datas);
 			this->sys_Status = SYS_SUCCESS;
 			this->sys_Step = SET_DATASET;
 			break;
@@ -105,6 +117,12 @@ void system_Controller(sysController_t *this)
 	}
 }
 
+/**
+* @brief Prepares the dataset for transmission or storage.
+* @note This function writes the system's gyro and accel data into the dataset buffer.
+* @param this: Pointer to the system controller structure.
+* @retval None
+*/
 void set_Datasets(sysController_t *this)
 {
 	this->DATASET[0] = 0xFA;
@@ -118,14 +136,23 @@ void set_Datasets(sysController_t *this)
 
 	this->DATASET[124] = 0xFA;
 	this->DATASET[125] = 0xFB;
+
+	GetCRC(this->DATASET, 128);
 }
 
-
+/**
+* @brief Writes float axis data (x, y, z) into a specified position of the dataset array.
+* @note This function splits the float data into bytes and writes them sequentially.
+* @param this: Pointer to the system controller structure.
+* @param data_f: The axis data to be written (x, y, z values).
+* @param addr: Starting address in the dataset array where the data will be written.
+* @retval None
+*/
 void write_float_to_array(sysController_t *this, axises data_f, uint8_t addr)
 {
-	uint8_t *x_ptr = (uint8_t *)&data_f->x;
-	uint8_t *y_ptr = (uint8_t *)&data_f->y;
-	uint8_t *z_ptr = (uint8_t *)&data_f->z;
+	uint8_t *x_ptr = (uint8_t *)&data_f.x;
+	uint8_t *y_ptr = (uint8_t *)&data_f.y;
+	uint8_t *z_ptr = (uint8_t *)&data_f.z;
 
 	this->DATASET[addr++] = x_ptr[0];
 	this->DATASET[addr++] = x_ptr[1];
@@ -141,6 +168,33 @@ void write_float_to_array(sysController_t *this, axises data_f, uint8_t addr)
 	this->DATASET[addr++] = z_ptr[1];
 	this->DATASET[addr++] = z_ptr[2];
 	this->DATASET[addr++] = z_ptr[3];
+}
+
+void GetCRC(uint8_t data[], uint8_t size)
+{
+	uint8_t crc[2];
+	uint16_t CRC_FULL = 0xFFFF;
+	uint8_t CRC_HIGH = 0xFF, CRC_LOW = 0xFF;
+	uint8_t CRCLSB;
+	uint8_t i, j;
+
+	for(i=0; i<size-2; i++){
+		CRC_FULL = (uint8_t)(CRC_FULL ^ data[i]);
+
+		for(j=0; j<8; j++){
+			CRCLSB = (uint8_t)(CRC_FULL & 0x0001);
+			CRC_FULL = (uint8_t)((CRC_FULL >> 1) & 0x7FFF);
+
+			if(CRCLSB == 1){
+				CRC_FULL = (uint8_t)(CRC_FULL ^ 0xA001);
+			}
+		}
+	}
+
+	crc[1] = CRC_HIGH = (uint8_t)((CRC_FULL >> 8) & 0xFF);
+	crc[0] = CRC_LOW = (uint8_t)(CRC_FULL & 0xFF);
+	data[size-2] = crc[0];
+	data[size-1] = crc[1];
 }
 
 

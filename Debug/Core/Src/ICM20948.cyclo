@@ -23,5 +23,7 @@
 ../Core/Src/ICM20948.c:625:19:icm20948_gyro_sample_rate_divider	1
 ../Core/Src/ICM20948.c:642:19:icm20948_accel_sample_rate_divider	2
 ../Core/Src/ICM20948.c:675:19:ak09916_operation_mode_setting	1
-../Core/Src/ICM20948.c:701:6:icm20948_gyro_full_scale_select	6
-../Core/Src/ICM20948.c:747:6:icm20948_accel_full_scale_select	6
+../Core/Src/ICM20948.c:693:6:icm20948_gyro_calibration	8
+../Core/Src/ICM20948.c:731:6:icm20948_accel_calibration	5
+../Core/Src/ICM20948.c:802:6:icm20948_gyro_full_scale_select	6
+../Core/Src/ICM20948.c:848:6:icm20948_accel_full_scale_select	6
