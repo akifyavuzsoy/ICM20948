@@ -1,0 +1,4 @@
+../Core/Src/controller.c:15:6:check_System_Status_Action	16	static
+../Core/Src/controller.c:66:6:check_icm20948	24	static
+../Core/Src/controller.c:97:6:check_ak09916	24	static
+../Core/Src/controller.c:127:6:reset_icm20948	24	static
