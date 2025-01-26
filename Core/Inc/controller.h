@@ -15,19 +15,40 @@
 
 #define MAJ_VERSİON		01
 #define MIN_VERSİON		01
-#define REV_VERSİON		01
+#define REV_VERSİON		02
 
 typedef enum {
     SYS_SUCCESS,
     SYS_FAULT,
-    SYS_ERROR
+    SYS_ERROR,
+	SYS_WAIT
 } sys_Status_e;
+
+typedef enum {
+    IMU_INIT
+} init_Step_e;
+
+typedef enum {
+    IMU_READ,
+	SET_DATASET
+} sys_Step_e;
 
 // IMU_Status, GPS Status gibi devem ettirip en son genel system status yaparız...
 
 typedef struct {
 
 	sys_Status_e sys_Status;
+	sys_Step_e sys_Step;
+	init_Step_e init_Step;
+
+	HAL_StatusTypeDef status;
+
+	axises gyro_datas;
+	axises accel_datas;
+
+	uint8_t ErrorCode;
+	uint8_t DATASET[128];
+
 	// TODO: Ana yapıdaki global değişkenleri burada tanımla alt yapıları için ayrı enum ve struct oluşturursun...
 
 } sysController_t;
@@ -37,6 +58,11 @@ typedef struct {
 #define LED_TOGGLE(GPIO_PORT, GPIO_PIN) HAL_GPIO_TogglePin(GPIO_PORT, GPIO_PIN)
 
 extern I2C_HandleTypeDef hi2c1;
+
+void check_System_Status_Action(sysController_t *this);
+
+void system_Init(sysController_t *this);
+void system_Controller(sysController_t *this);
 
 void check_icm20948(sysController_t *this);
 void check_ak09916(sysController_t *this);

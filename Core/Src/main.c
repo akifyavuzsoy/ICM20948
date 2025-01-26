@@ -108,7 +108,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //bool id_ok = icm20948_who_am_i();
-
+  system_Init(&controller);
+  check_System_Status_Action(&controller);
 
   /* USER CODE END 2 */
 
@@ -121,11 +122,12 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+    system_Controller(&controller);
     check_System_Status_Action(&controller);	// TODO: Yeni bir task oluşturup eş zamanlı sürekli kontrol etmesi lazım örn RTOS
 
-    check_icm20948(&controller);		// Bu sonktionu başka bir fonskiyonda case içinde adım adım çağıracak şekilde yapabilirsin...
+    //check_icm20948(&controller);		// Bu sonktionu başka bir fonskiyonda case içinde adım adım çağıracak şekilde yapabilirsin...
     //check_ak09916(&controller);
-    reset_icm20948(&controller);
+    //reset_icm20948(&controller);
     HAL_Delay(1000);
 
 
